@@ -1,0 +1,4 @@
+Juana;Borges;9
+Maria;Ferranz;10
+Noemí;Zola;4
+Cesar;Cruz;8

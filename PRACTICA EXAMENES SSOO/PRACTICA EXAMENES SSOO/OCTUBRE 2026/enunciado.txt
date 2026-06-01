@@ -1,0 +1,34 @@
+Normativa:
+Sistemas Operativos
+Examen de problemas
+17 de octubre de 2025
+Grado en Ingeniería Informática
+Este examen consta de 1 ejercicio
+Tiempo para la realización del examen: 50 minutos, gestiona bien el tiempo.
+Se debe entregar mediante fichero de texto en la entrega correspondiente en cada apartado en Aula Virtual.
+Para comentarios o apartados de texto se pueden especificar mediante la sintaxis de comentarios del lenguaje utilizado.
+No se permite usar trabajo que no sea vuestro directamente, ni compartir ni parcial ni totalmente vuestra solución.
+Las entregas se comprobarán mediante software anticopia. Solo se podrá consultar la hoja resumen de mandatos, este enunciado y se podrá utilizar el mandato man.
+
+1) (10 puntos) Escribe un script llamado filtra_archivos.sh que actúe según la siguiente sintaxis:
+$ filtra_archivos.sh <ext1> <ext2> <ext3> <fichSal> [<ruta a buscar>]
+
+El script debe comprobar si los argumentos son correctos y realizar las siguientes acciones según los argumentos:
+• Buscar de forma recursiva todos los ficheros en la <ruta a buscar> que terminen por alguna de las 3 extensiones introducidas como parámetros (<ext1>, <ext2>, <ext3>). En caso de no recibir <ruta a buscar> se buscará en el directorio actual.
+• Para cada extensión será necesario calcular:
+  - Numero de archivos encontrados
+  - Tamaño total en bytes de los archivos.
+• Por último, se deberá crear (o añadir si existe) en el fichero <fichSal> un mensaje siguiendo el formato de ejemplo:
+
+$ filtra_archivos.sh txt sh py out.txt /home/pepe
+Directorio analizado: /home/pepe
+Fecha de ejecución: Thu Oct 17 09:30:21 CEST 2025
+Extensión | # de archivos | Tamaño total
+txt       | 12           | 48 bytes
+sh        | 3            | 9 bytes
+Total archivos: 15
+Total tamaño: 57 bytes
+
+Se pide (NOTA: adjuntar la solución en un fichero llamado filtra_archivos.sh):
+a) (2,5 puntos) Comprobación correcta del número y tipo de argumentos y control de errores.
+b) (7,5 puntos) Cumplir correctamente con la funcionalidad del script, incluyendo la cuenta del número de ficheros, cálculo de tamaños, manejo de la salida a fichero, etc.

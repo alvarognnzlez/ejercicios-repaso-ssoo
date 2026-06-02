@@ -35,3 +35,34 @@ done
 #do
 #	chmod u+x $1
 #done
+
+
+
+########################
+
+if test $#  -gt 1 
+then
+	echo "Uso incorrecto"
+	echo "Uso: $0 [directorio]"
+	exit 1
+
+	elif test $# -eq 1
+	then 
+		if ! test -d $1
+		then 
+			echo "Directorio $1 no valido"
+			exit 1
+		else
+			DIR="$1"
+		fi
+
+	else
+	DIR="./"	
+fi
+
+for i in `find $DIR -type f -name "*.sh"`
+do
+	
+	chmod u+x
+	echo "Permiso añadido a fichero $1"
+done

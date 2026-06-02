@@ -27,3 +27,39 @@ done
 
 
     
+###############################333
+
+if test $# -ne 1
+    then 
+        echo "Uso: $0 nombreFichero"
+        exit 1
+
+    else
+
+    if ! test -f $1
+        then
+            echo "Fichero $1 es un fichero no valido"
+            exit 1
+    else
+        fichero="$1"
+        encontrado=0
+    fi
+fi
+
+for i in echo `$PATH | tr -s ":" "\n"`
+do 
+    cadena= find `$i -name $fichero`
+    if test -n $cadena
+    then    
+        encontrado=1
+        echo "El archivo $fichero esta en la cadena $i"
+    fi
+done
+
+if test $CADENA -eq 1
+    then    
+        echo "Cadena encontrada"
+
+    else echo "Cadena no encontrada"
+
+fi

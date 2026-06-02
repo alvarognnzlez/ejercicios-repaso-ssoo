@@ -13,3 +13,22 @@ do
     fi    
 done
 
+###################33
+
+
+if test $# -ne 1
+then
+    echo "Uso incorrecto"
+    echo "Uso $0"
+    exit 1
+fi
+
+for i in ls`/bin`
+
+do
+    if ! test -e /usr/share/man/man1/{$1}.1.gz
+    then    
+        echo "El comando $1 no tiene pagina de manual"
+        exit 0
+    fi
+done

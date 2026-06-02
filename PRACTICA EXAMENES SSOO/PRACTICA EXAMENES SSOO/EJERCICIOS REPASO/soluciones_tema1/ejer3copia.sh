@@ -25,3 +25,31 @@ fi
 cd $directorio
 lista = `ls` #creamos una lista donde almacenaremos todos los valores obtenidos con ls
 du -b lista | sort -n -r | head -2
+
+
+
+
+######################################3
+
+
+if ! test $# -gt 1
+then 
+    echo "Uso incorrecto"
+    echo "Uso correcto $0 directorio"
+elif test $# -eq 1
+then
+    if ! test -d $1
+        then
+            echo "Directorio $1 no valido"
+            exit 1
+        else
+         directorio=$1
+    fi
+
+    else
+    directorio="./"
+
+fi
+
+cd $directorio
+ls `directorio` | du -b | head -2 

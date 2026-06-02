@@ -42,3 +42,41 @@ tar -czf $archivo -C $temporal .
 rm -rf $temporal
 
 echo "Proceso completado: se han eliminado los archivos superiores a 8 KB de $archivo"
+
+
+#####################################################
+
+if test $# -ne 1
+then
+	echo "Uso incorrecto"
+	exho "Uso correcto $0 archivo.tgz"
+	exit 1
+fi
+$archivo="$1"
+
+if ! test -f $archivo
+then
+	echo "Fichero $archivo incorrecto "
+	exit 1
+fi
+
+if ! echo `$archivo` | grep -q "\.tgz$"
+then
+	echo "El archivo $archivo no es un .tgz"
+	exit 1 
+
+fi
+
+
+temporal=$(mktemp -d)  #creamos el fichero temporal
+
+
+tar -xzf $archivo -C  $temporal
+
+find $temporal -type f -size +8k -delete
+
+tar -czf $archivo -C $temporal
+
+rm -rf $temporal
+
+echo "Ficheros eliminados correctamente"

@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compilar C (gcc 64-bit con pthread)",
+            "type": "shell",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}.exe",
+                "-lpthread",
+                "-Wall",
+                "-g"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+}

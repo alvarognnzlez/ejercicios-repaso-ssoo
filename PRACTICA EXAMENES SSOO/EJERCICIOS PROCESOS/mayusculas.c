@@ -1,12 +1,14 @@
-//necesitamos 2 procesos, uno que será el proceso padre y otro el proceso hijo, conectadas por 2 tuberías
-//una irá direccion al hijo y otra el padre padre->escritura->hijo     hijo->lectura->padre
+// necesitamos 2 procesos, uno que será el proceso padre y otro el proceso hijo,
+// conectadas por 2 tuberías una irá direccion al hijo y otra el padre
+// padre->escritura->hijo     hijo->lectura->padre
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+
 
 /*
 int main (int argc, char** argv){
@@ -15,7 +17,7 @@ int main (int argc, char** argv){
     int h_p[2];
     pid_t pid;
     char buff[1024]
-    
+
 
     pid = fork();
 
@@ -56,28 +58,20 @@ int main (int argc, char** argv){
 
 */
 
-int main(int argc, char** argv){
-    pid_t pid;
-    int p_h[2]; //declaramos las tuberias del padre  (solo escribe)
-    int h_p[2]; //declaramos las tuberias del hijo (solo lee) y pasa a toUpper
-    char buff[1024]; // el buffer de donde el padre leerá y el hijo escribirá
+int main(int argc, char **argv) {
+  char buffer[1024];
+  int pipe_padre[2]; // tuberia en la que escribe el padre
+  int pipe_hijo[2];  // tubería en la que escribe el hijo
+  pid_t pid;
 
-    pid=fork();
+  pipe(pipe_hijo);
+  pipe(pipe_padre);
 
-    if(pid==0){ //significa que es el hijo
-        //primer tenemos que cerrar las tuberias que no se vayan a usar 
-        //teneemos 4 tuberias padre 1escritura padre 0lectura hijo 1escritura hijo0 lectura
+  pid = fork();
 
-        close(p_hijo[0]);
-        close(p_padre[1]);
+  if (pid > 0) { // error
+    fprintf(stderr, "Error al hacer fork()", strerror(errno));
+    exit(1);
 
-    }
-
+  } else
 }
-
-
-
-
-
-
-

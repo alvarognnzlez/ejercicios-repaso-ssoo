@@ -1,0 +1,71 @@
+Guía de Estudio: Ejercicios de Procesos en C
+Este documento explica detalladamente el funcionamiento de los 5 programas implementados para facilitar su estudio.
+---
+1. `ejecuta.c` - Ejecución de Comandos Básica
+Objetivo: Crear un programa que actúe como un lanzador de otros comandos (un "wrapper").
+Funcionamiento:
+`fork()`: El programa se divide en dos procesos: Padre e Hijo.
+Hijo (`pid == 0`):
+Usa `execvp(argv[1], &argv[1])`.
+`execvp` toma el nombre del comando (segundo argumento del programa) y el array de argumentos.
+Esta función reemplaza el código actual del proceso hijo con el código del comando invocado. Si tiene éxito, el código C posterior a `execvp` nunca se ejecuta.
+Si falla (e.g., comando no existe), `execvp` retorna -1, por lo que imprimimos el error y salimos con `exit(EXIT_FAILURE)`.
+Padre (`pid > 0`):
+Usa `wait(&status)` para detener su ejecución hasta que el hijo termine.
+Analiza `status` con macros:
+`WIFEXITED(status)`: ¿Terminó normalmente?
+`WEXITSTATUS(status)`: ¿Cuál fue su código de salida? (0 suele ser éxito).
+---
+2. `mayusculas.c` - Comunicación Bidireccional (Pipes)
+Objetivo: Comunicación de ida y vuelta: Padre envía texto -> Hijo transforma -> Padre recibe.
+Funcionamiento:
+Dos Pipes `pipe(fd)`:
+Las tuberías son unidireccionales. Para ida y vuelta, necesitamos dos: `fd1` (Padre->Hijo) y `fd2` (Hijo->Padre).
+`fdopen()`:
+Convierte un descriptor de archivo "crudo" (int) en un flujo de archivo estándar (`FILE *`). Esto nos permite usar funciones de alto nivel como `fgets` y `fputs` en lugar de `read` y `write`, manejando mejor las líneas de texto.
+El Ciclo de Comunicación:
+Padre: Lee teclado -> Escribe en `fd1` -> `fflush()` -> Lee respuesta de `fd2`.
+Hijo: Lee de `fd1` -> Convierte a mayúsculas (`toupper`) -> Escribe en `fd2` -> `fflush()`.
+Nota Importante: `fflush()` es crucial porque los `FILE*` tienen buffer interno. Sin `fflush`, los datos se quedarían en memoria y el otro proceso se quedaría esperando eternamente (deadlock).
+---
+3. `aleatorios.c` - Señales y Generación Asíncrona
+Objetivo: El hijo actúa como un servidor de números aleatorios que responde solo cuando se le solicita mediante una señal.
+Funcionamiento:
+Manejador de Señal (`signal`):
+El hijo registra una función (`handle_sigusr1`) para capturar la señal `SIGUSR1`. Esta función solo levanta una bandera (`sig_received = 1`).
+`pause()`:
+El hijo entra en un bucle infinito donde se queda dormido esperando una señal. Esto es eficiente y no gasta CPU.
+Generación Bajo Demanda:
+Padre: Cuando lee una línea, envía `kill(pid, SIGUSR1)` al hijo. Inmediatamente entra en un `read()` bloqueante en la tubería.
+Hijo: Despierta del `pause`, genera `rand()`, lo escribe en el pipe, y vuelve a dormirse.
+Cierre: Al final, el padre envía `SIGTERM` para matar al hijo limpiamente.
+---
+4. `relevos.c` - Sincronización de Múltiples Procesos
+Objetivo: Simular una carrera de relevos donde un proceso activa al siguiente secuencialmente.
+Funcionamiento:
+El problema de los PIDs:
+Cuando haces `fork()`, el padre conoce el PID del hijo, pero los hermanos no se conocen entre sí.
+Solución: El padre crea todos los hijos primero, guarda sus PIDs en un array, y luego envía el array completo a todos los hijos a través de una tubería.
+Espera Activa (Busy Wait vs Pause):
+Los hijos esperan su turno. Usamos `pause()` dentro de un bucle `while(!sig_received)` para esperar eficientemente.
+Pasar el Testigo:
+Padre -> Activa Hijo 0.
+Hijo 0 corre -> Activa Hijo 1 (`kill(pid_hijo1, SIGUSR1)`).
+Hijo 1 corre -> Activa Hijo 2...
+Así hasta el último.
+---
+5. `doscomandos.c` - Redirección de Entrada/Salida (`dup2`)
+Objetivo: Simular el "pipe operator" de Linux (`|`), ejecutando `ls -la | tr "d" "D"`.
+Funcionamiento:
+`dup2(oldfd, newfd)`: Esta es la llamada clave. Copia un descriptor de archivo sobre otro.
+Hijo 1 (Productor - `ls`):
+Quiere escribir en el pipe en lugar de en la pantalla.
+Hace `dup2(fd[1], STDOUT_FILENO)`. Ahora, el descriptor 1 (salida estándar) apunta al pipe.
+Ejecuta `execlp("ls",...)`. El comando `ls` escribe en el descriptor 1 sin saber que es una tubería.
+Hijo 2 (Consumidor - `tr`):
+Quiere leer del pipe en lugar del teclado.
+Hace `dup2(fd[0], STDIN_FILENO)`. Ahora el descriptor 0 (entrada estándar) lee del pipe.
+Ejecuta `execlp("tr",...)`. El comando `tr` lee del descriptor 0 sin saber que viene de otro programa.
+El Padre y el Cierre de Pipes:
+Es fundamental que el padre cierre `fd[0]` y `fd[1]`.
+Si el extremo de escritura del pipe queda abierto en algún proceso (como el padre), el Hijo 2 nunca recibirá la señal de "Fin de Archivo" (EOF) y se quedará esperando datos eternamente.

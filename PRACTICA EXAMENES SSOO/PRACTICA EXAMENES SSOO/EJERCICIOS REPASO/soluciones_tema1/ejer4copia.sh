@@ -1,34 +1,20 @@
 #!/bin/bash
-#hay que buscar cuales de los ficheros en /bin NO tienen la pagina de manual
-#tiene una pagina explicando el mandato en el manual.
-#las páginas estan en /usr/share/man/man1/nombre.1.gz
 
-#como tal no pide un numero de argumetnos simplemente tenemos ue buscar en una direccion
+# ejer4copia.sh: lista los comandos de /bin que NO tienen página de manual
 
-for i in `ls /bin`
-do
-    if ! test -e e /usr/share/man/man1/$1.1.gz
-    then    
-        echo "$1 no tiene entrada de manual"
-    fi    
-done
-
-###################33
-
-
-if test $# -ne 1
+# No necesita argumentos
+if test $# -ne 0
 then
-    echo "Uso incorrecto"
-    echo "Uso $0"
+    echo "Uso: $0  (sin argumentos)"
     exit 1
 fi
 
-for i in ls`/bin`
-
+for i in $(ls /bin)   # ← el original usaba la variable $1 dentro del bucle en vez de $i
 do
-    if ! test -e /usr/share/man/man1/{$1}.1.gz
-    then    
-        echo "El comando $1 no tiene pagina de manual"
-        exit 0
+    if ! test -e "/usr/share/man/man1/$i.1.gz"   # ← era "$1" y "e /usr/..." (espacio extra)
+    then
+        echo "$i no tiene entrada de manual"
     fi
 done
+
+exit 0

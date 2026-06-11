@@ -1,65 +1,35 @@
- #!/bin/bash
+#!/bin/bash
 
-if test $# -ne 1 
+# ejer2copia.sh: busca un fichero en todos los directorios del PATH
+
+if test $# -ne 1
 then
-    echo "Uso \"$0 archivo\" " 
+    echo "Uso: $0 archivo"
     exit 1
+fi  # ← faltaba el fi que cerraba el if (el original tenía el cuerpo del script fuera del if)
 
-NOMBRE_ARCHIVO=$1
-ENCONTRADO=0 #Variable que usaremos para salir del bucle
+NOMBRE_ARCHIVO="$1"
+ENCONTRADO=0
 
-echo -e "-Buscando archivo-----------------"
-for RUTA_PATH in `echo $PATH | tr -s ':' '\n'` #sustituye : por un salto de linea
+echo "-Buscando archivo-----------------"
+
+# ← era: for RUTA_PATH in `echo $PATH | tr -s ':' '\n'`
+# Correcto: tr ':' '\n' (tr no necesita -s para esto, y la sintaxis de escape era incorrecta)
+for RUTA_PATH in $(echo "$PATH" | tr ':' '\n')
 do
-    CADENA=`find $RUTA_PATH -name $NOMBRE_ARCHIVO` 
-    if ! test -z $CADENA
+    # ← era: CADENA=`find $RUTA_PATH -name $NOMBRE_ARCHIVO` (sin comillas, vulnerable a espacios)
+    CADENA=$(find "$RUTA_PATH" -name "$NOMBRE_ARCHIVO" 2>/dev/null)
+    if test -n "$CADENA"   # ← era: ! test -z (equivalente pero menos claro)
     then
         echo "$NOMBRE_ARCHIVO está en $CADENA"
         ENCONTRADO=1
     fi
 done
-    if test $ENCONTRADO -eq 0
-    then
-        echo "$NOMBREARCHIVO no se ha encontrado en la ruta del PATH"
-        exit 1
-    fi
 
-
-
-    
-###############################333
-
-if test $# -ne 1
-    then 
-        echo "Uso: $0 nombreFichero"
-        exit 1
-
-    else
-
-    if ! test -f $1
-        then
-            echo "Fichero $1 es un fichero no valido"
-            exit 1
-    else
-        fichero="$1"
-        encontrado=0
-    fi
+if test $ENCONTRADO -eq 0
+then
+    echo "$NOMBRE_ARCHIVO no se ha encontrado en la ruta del PATH"  # ← typo $NOMBREARCHIVO → $NOMBRE_ARCHIVO
+    exit 1
 fi
 
-for i in echo `$PATH | tr -s ":" "\n"`
-do 
-    cadena= find `$i -name $fichero`
-    if test -n $cadena
-    then    
-        encontrado=1
-        echo "El archivo $fichero esta en la cadena $i"
-    fi
-done
-
-if test $CADENA -eq 1
-    then    
-        echo "Cadena encontrada"
-
-    else echo "Cadena no encontrada"
-
-fi
+exit 0
